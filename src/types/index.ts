@@ -59,3 +59,14 @@ export type ScanResult = {
 };
 
 export type AppState = 'idle' | 'loading' | 'scanning' | 'done' | 'error';
+
+export type TabKey = 'home' | 'report' | 'profile';
+
+export const FACE_SHAPE_LABELS: Record<FaceShape, string> = {
+  oval: '鹅蛋脸',
+  round: '圆脸',
+  square: '方脸',
+  heart: '心形脸',
+  long: '长脸',
+  diamond: '菱形脸',
+};

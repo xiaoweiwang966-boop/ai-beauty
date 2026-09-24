@@ -44,7 +44,7 @@ export default function LandmarkCanvas({ imageUrl, landmarks, showMesh }: Props)
 
       const w = imgRef.current.naturalWidth;
       const h = imgRef.current.naturalHeight;
-      const maxW = 600;
+      const maxW = 400;
       const scale = w > maxW ? maxW / w : 1;
       canvas.width = w * scale;
       canvas.height = h * scale;
@@ -113,7 +113,7 @@ export default function LandmarkCanvas({ imageUrl, landmarks, showMesh }: Props)
   }, [imageUrl, landmarks, showMesh]);
 
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-slate-900/60 border border-slate-700">
+    <div className="relative rounded-2xl overflow-hidden bg-slate-900/60 border border-slate-700/50">
       <canvas ref={canvasRef} className="w-full h-auto block" />
     </div>
   );
