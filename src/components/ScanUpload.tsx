@@ -3,11 +3,12 @@ import { Camera, ImagePlus, X } from 'lucide-react';
 
 type Props = {
   onImageSelected: (imageUrl: string, imageElement: HTMLImageElement) => void;
+  onCameraImageSelected?: (imageUrl: string, imageElement: HTMLImageElement) => void;
   imageUrl: string | null;
   disabled?: boolean;
 };
 
-export default function ScanUpload({ onImageSelected, imageUrl, disabled }: Props) {
+export default function ScanUpload({ onImageSelected, onCameraImageSelected, imageUrl, disabled }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
 
@@ -18,10 +19,11 @@ export default function ScanUpload({ onImageSelected, imageUrl, disabled }: Prop
       const img = new Image();
       img.onload = () => {
         onImageSelected(url, img);
+        if (onCameraImageSelected) onCameraImageSelected(url, img);
       };
       img.src = url;
     },
-    [onImageSelected]
+    [onCameraImageSelected, onImageSelected]
   );
 
   if (imageUrl) {

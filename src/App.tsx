@@ -92,14 +92,17 @@ export default function App() {
     []
   );
 
-  const handleScan = useCallback(async () => {
-    if (!imageElement) return;
+  const handleScan = useCallback(async (
+    selectedImageElement: HTMLImageElement | null = imageElement,
+    selectedImageUrl: string | null = imageUrl
+  ) => {
+    if (!selectedImageElement) return;
 
     setState('loading');
     setErrorMsg('');
 
     try {
-      const detection = await detectFace(imageElement);
+      const detection = await detectFace(selectedImageElement);
       if (!detection) {
         setState('error');
         setErrorMsg('未检测到面部，请上传一张清晰的正脸照片');
@@ -123,13 +126,13 @@ export default function App() {
       };
 
       const canvas = document.createElement('canvas');
-      const w = imageElement.naturalWidth;
-      const h = imageElement.naturalHeight;
+      const w = selectedImageElement.naturalWidth;
+      const h = selectedImageElement.naturalHeight;
       canvas.width = w;
       canvas.height = h;
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
       if (!ctx) throw new Error('Canvas context not available');
-      ctx.drawImage(imageElement, 0, 0, w, h);
+      ctx.drawImage(selectedImageElement, 0, 0, w, h);
       const imageData = ctx.getImageData(0, 0, w, h);
 
       const skin = analyzeSkin(imageData, detection.landmarks, w, h);
@@ -139,14 +142,14 @@ export default function App() {
         analysis,
         skin,
         recommendations,
-        imageUrl: imageUrl ?? '',
+        imageUrl: selectedImageUrl ?? '',
       };
       setResult(scanResult);
       setState('done');
 
       // Save to history
       saveScanHistory({
-        image_url: imageUrl ?? '',
+        image_url: selectedImageUrl ?? '',
         overall_score: analysis.overallScore,
         skin_score: skin.overallScore,
         face_shape: shapeResult.shape,
@@ -160,6 +163,14 @@ export default function App() {
       );
     }
   }, [imageElement, imageUrl]);
+
+  const handleCameraImageSelected = useCallback(
+    (url: string, img: HTMLImageElement) => {
+      handleImageSelected(url, img);
+      void handleScan(img, url);
+    },
+    [handleImageSelected, handleScan]
+  );
 
   const handleReset = useCallback(() => {
     setImageUrl(null);
@@ -350,11 +361,11 @@ export default function App() {
               </div>
 
               {/* Feature cards — horizontal scroll mini-program style */}
-              <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-none mb-4">
+              <div className="grid grid-cols-3 gap-2 mb-4">
                 {FEATURES.map((f, i) => (
                   <div
                     key={i}
-                    className="glass-card rounded-2xl p-4 min-w-[140px] animate-fadeInUp shrink-0"
+                    className="glass-card rounded-2xl p-2.5 sm:p-4 animate-fadeInUp min-w-0"
                     style={{ animationDelay: `${i * 100}ms` }}
                   >
                     <div className="flex flex-col items-center text-center">
@@ -375,6 +386,7 @@ export default function App() {
               <div className="animate-fadeInUp" style={{ animationDelay: '300ms' }}>
                 <ScanUpload
                   onImageSelected={handleImageSelected}
+                  onCameraImageSelected={handleCameraImageSelected}
                   imageUrl={imageUrl}
                   disabled={state === 'loading'}
                 />
